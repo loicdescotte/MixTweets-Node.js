@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Mix tweeets node</title>
+        <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script>
+        $( document ).ready(function() {     
+          $("#go").click(function() {
+            var urlParams = $("#params").val();     
+            $.each(urlParams.split(","), function( index, value ) {
+              console.log( index + ": " + value );
+              $(".messages").append("<h3 id='message"+index+"'>" + value + "</h3>");
+             });
+            var source = new EventSource("/stream?topics=" + urlParams);
+            source.addEventListener('message', function(event) {              
+                console.log("event", event);
+                var result  = jQuery.parseJSON(event.data);             
+                $.each(urlParams.split(","), function( index, value ) {
+                  if(result.message.toLowerCase().indexOf(value.toLowerCase()) === 0){
+                    $("#message"+index).html(result.message + " - " + result.author)
+                  }
+                });
+            });
+          });          
+        });
+        </script>
+    </head>
+    <body>
+        <h2>Live mixed-tweets</h2>
+        <p>Enter search parameters (comma separated) </p>
+        
+        <textarea id="params"></textarea>
+        <br/>
+
+        <input type="button" id="go" value="Go!">
+
+        <div class="messages">
+          
+        </div>
+          
+        <script type="text/javascript" charset="utf-8">
+          
+        </script>
+    </body>
+</html>
